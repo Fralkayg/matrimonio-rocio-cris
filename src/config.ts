@@ -8,6 +8,8 @@ import fiesta from './assets/fiesta-a.png';
 import auto from './assets/auto-c.png';
 import comida from './assets/comida-a.png';
 import regalos from './assets/regalos-c.png';
+import vestimenta from './assets/vestimenta-negro-c.png';
+import confirmar from './assets/confirmar-a.png';
 
 /** Día del matrimonio. Alimenta la fecha larga, el 30 . 01 . 27 y los días que faltan. */
 export const FECHA_MATRIMONIO = '2027-01-30';
@@ -78,6 +80,7 @@ export const VESTIMENTA = {
   detalle: 'Queremos darle un ambiente formal a nuestro matrimonio.',
   /** Se muestra aparte, porque es la única petición concreta. */
   nota: 'Les pedimos reservar el color blanco exclusivamente para la novia.',
+  imagen: vestimenta,
 } as const;
 
 export const RSVP = {
@@ -85,6 +88,7 @@ export const RSVP = {
   limite: '10 de diciembre',
   instruccion: 'Por favor confirmen indicando el nombre de todos los asistentes.',
   soloAdultos: 'Celebración solo para adultos',
+  imagen: confirmar,
 } as const;
 
 export const REGALOS = {
