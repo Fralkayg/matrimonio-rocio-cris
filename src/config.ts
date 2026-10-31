@@ -207,19 +207,15 @@ export const EVENTO = {
 } as const;
 
 /**
- * La canción de los novios. `id` vacío = la sección no se muestra, para que el
- * sitio nunca quede con un reproductor roto.
- *
- * - Spotify: el id sale de la URL de la canción,
- *   open.spotify.com/track/<id> (o «Compartir › Copiar link»).
- * - YouTube: el id es lo que va después de `v=`.
+ * La canción de los novios, en el botón ♪ del header. `id` vacío = no hay
+ * botón, para que el sitio nunca quede con un reproductor roto.
+ * El id sale de la URL de Spotify: open.spotify.com/track/<id>
+ * (o «Compartir › Copiar link»).
  */
 export const CANCION = {
-  tipo: 'spotify' as 'spotify' | 'youtube',
   id: '6RUKPb4LETWmmr3iAEQktW',
   titulo: 'Something Just Like This',
   artista: 'The Chainsmokers & Coldplay',
-  nota: 'La canción que nos tiene bailando desde el primer día.',
 } as const;
 
 export const NAV = [
