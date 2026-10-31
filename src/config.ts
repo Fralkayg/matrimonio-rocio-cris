@@ -24,10 +24,13 @@ export const INICIO_CEREMONIA = '2027-01-30T18:00:00-03:00';
 /** Fecha límite para confirmar asistencia. */
 export const FECHA_LIMITE_RSVP = '2026-12-10';
 
+/** URL pública del sitio. La usan las etiquetas Open Graph y el evento de calendario. */
+export const SITIO_URL = 'https://fralkayg.github.io/matrimonio-rocio-cris/';
+
 export const NOVIOS = {
-  titulo: 'Cristián & Rocío',
+  titulo: 'Rocío & Cristián',
   firma: 'Rocío & Cristián',
-  iniciales: 'C & R',
+  iniciales: 'R & C',
   creditos: '[sus amigos]',
 } as const;
 
@@ -130,13 +133,13 @@ export type Pregunta = { q: string; o: string[]; c: number };
 
 /** c = índice de la respuesta correcta (0 = primera opción). Reemplazar los [placeholders]. */
 export const PREGUNTAS: Pregunta[] = [
-  { q: '¿Dónde se conocieron Cristián y Rocío?', o: ['[Lugar A]', '[Lugar B]', '[Lugar C]', '[Lugar D]'], c: 0 },
+  { q: '¿Dónde se conocieron Rocío y Cristián?', o: ['[Lugar A]', '[Lugar B]', '[Lugar C]', '[Lugar D]'], c: 0 },
   { q: '¿En qué año empezaron a pololear?', o: ['[Año A]', '[Año B]', '[Año C]', '[Año D]'], c: 0 },
-  { q: '¿Quién dio el primer paso?', o: ['Cristián', 'Rocío', 'Un amigo en común', 'Fue mutuo'], c: 0 },
+  { q: '¿Quién dio el primer paso?', o: ['Rocío', 'Cristián', 'Un amigo en común', 'Fue mutuo'], c: 0 },
   { q: '¿Cuál fue su primer viaje juntos?', o: ['[Destino A]', '[Destino B]', '[Destino C]', '[Destino D]'], c: 0 },
   { q: '¿Dónde fue la propuesta de matrimonio?', o: ['[Lugar A]', '[Lugar B]', '[Lugar C]', '[Lugar D]'], c: 0 },
   { q: '¿Cuál es la comida favorita de los dos?', o: ['[Comida A]', '[Comida B]', '[Comida C]', '[Comida D]'], c: 0 },
-  { q: '¿Quién es más probable que llegue tarde?', o: ['Cristián', 'Rocío', 'Los dos, siempre', 'Ninguno, son puntuales'], c: 0 },
+  { q: '¿Quién es más probable que llegue tarde?', o: ['Rocío', 'Cristián', 'Los dos, siempre', 'Ninguno, son puntuales'], c: 0 },
   { q: '¿Qué serie vieron juntos de principio a fin?', o: ['[Serie A]', '[Serie B]', '[Serie C]', '[Serie D]'], c: 0 },
 ];
 
@@ -188,6 +191,36 @@ export const HISTORIA: Capitulo[] = [
     foto: 'Foto · la propuesta',
   },
 ];
+
+/**
+ * El evento que se agenda al tocar «Agregar al calendario». Parte a la hora de
+ * llegada y no a las 18:00 de la ceremonia, para que nadie llegue justo.
+ * Los dos extremos llevan el huso de Chile explícito.
+ */
+export const EVENTO = {
+  titulo: 'Matrimonio de Rocío & Cristián',
+  inicio: '2027-01-30T17:30:00-03:00',
+  fin: '2027-01-31T02:00:00-03:00',
+  lugar: `${LUGAR.nombre}, ${LUGAR.direccion}`,
+  descripcion:
+    'Llegada 17:30 h · Ceremonia 18:00 h en punto · La fiesta es en el mismo fundo. Vestimenta formal (el blanco es solo para la novia).',
+} as const;
+
+/**
+ * La canción de los novios. `id` vacío = la sección no se muestra, para que el
+ * sitio nunca quede con un reproductor roto.
+ *
+ * - Spotify: el id sale de la URL de la canción,
+ *   open.spotify.com/track/<id> (o «Compartir › Copiar link»).
+ * - YouTube: el id es lo que va después de `v=`.
+ */
+export const CANCION = {
+  tipo: 'spotify' as 'spotify' | 'youtube',
+  id: '',
+  titulo: '[Nombre de la canción]',
+  artista: '[Artista]',
+  nota: 'La canción que nos tiene bailando desde el primer día.',
+} as const;
 
 export const NAV = [
   // { href: '#historia', label: 'Historia' },

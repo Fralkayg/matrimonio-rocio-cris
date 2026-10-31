@@ -6,6 +6,7 @@ import { Invitacion } from './components/Invitacion';
 // import { Historia } from './components/Historia';
 import { GranDia } from './components/GranDia';
 import { Detalles } from './components/Detalles';
+import { Cancion } from './components/Cancion';
 import { Rsvp } from './components/Rsvp';
 // import { Trivia } from './components/Trivia';
 import { Footer } from './components/Footer';
@@ -19,6 +20,7 @@ export default function App() {
       {/* <Historia /> */}
       <GranDia />
       <Detalles />
+      <Cancion />
       <Rsvp />
       {/* <Trivia /> */}
       <Footer />

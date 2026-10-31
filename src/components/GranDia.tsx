@@ -9,6 +9,7 @@ import { Reveal } from './ui/Reveal';
 import { Script } from './ui/Script';
 import { Ilustracion } from './ui/Ilustracion';
 import { Vestimenta } from './Vestimenta';
+import { BotonCalendario } from './ui/BotonCalendario';
 
 export function GranDia() {
   const fecha = useFecha();
@@ -57,6 +58,10 @@ export function GranDia() {
             >
               {fecha.cuenta}
             </Typography>
+
+            <Box sx={{ mt: 3 }}>
+              <BotonCalendario />
+            </Box>
           </Box>
         </Reveal>
 
