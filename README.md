@@ -1,4 +1,4 @@
-# Cristián & Rocío — sitio del matrimonio
+# Rocío & Cristián — sitio del matrimonio
 
 Sitio de una página para el matrimonio del **30 de enero de 2027** en el Fundo Los Cóndores,
 San Bernardo. Reconstruye el archivo de diseño (`design-assets/Cristian-Rocio-diseno.pdf`) y usa
@@ -42,9 +42,10 @@ src/
   config.ts              ← TODO el contenido editable (fechas, lugar, links, trivia, historia)
   theme.ts               ← paleta y tipografía del diseño
   hooks/useFecha.ts       ← fecha larga, 30 . 01 . 27 y la cuenta regresiva
+  lib/calendario.ts       ← genera el .ics y el link de Google Calendar
   styles/                 ← fuentes + papel + rejilla de la línea de tiempo
   components/
-    Nav, Hero, Invitacion, Historia, GranDia, Detalles, Rsvp, Trivia, Footer
+    Nav, Hero, Invitacion, Historia, GranDia, Detalles, Cancion, Rsvp, Trivia, Footer
     ui/                   ← Reveal, SectionHeading, PaperCard, Script, Deco, Iconos
 ```
 
@@ -84,6 +85,7 @@ Todo lo que queda entre `[corchetes]` vive en [src/config.ts](src/config.ts):
 | `PREGUNTAS` | Las respuestas de la trivia. **`c` es el índice de la correcta (0 = la primera); hoy están todas en 0** |
 | `TRIVIA.premio` | Qué se gana quien saque el mejor puntaje |
 | `NOVIOS.creditos` | Quién hizo el sitio |
+| `CANCION.id` | El id de la canción de los novios. **Con `id` vacío la sección entera no se muestra**, así que el sitio nunca queda con un reproductor roto |
 
 Las fotos de la línea de tiempo son recuadros grises con su pie. Para ponerlas de verdad, agrega el
 campo de imagen a `Capitulo` en `src/config.ts` y reemplaza el `<Foto>` de
@@ -104,3 +106,27 @@ pantallazo.
 
 Cormorant Garamond (400/500/600, normal e italic) y Sacramento, subset latino, self-hosted bajo
 SIL Open Font License. Están en `src/assets/fonts/` y Vite les pone hash en el build.
+
+## Vista previa al compartir (Open Graph)
+
+Las etiquetas están en [index.html](index.html) y la imagen es `public/og.jpg` (1200×630),
+que Vite copia tal cual a la raíz del build.
+
+Dos cosas a tener en cuenta si la cambias:
+
+- **Las URL de las etiquetas son absolutas y están escritas a mano.** Los scrapers de WhatsApp
+  y compañía no resuelven rutas relativas, así que `base: './'` no sirve acá. Si cambia el
+  dominio, hay que editarlas en `index.html` (y `SITIO_URL` en `config.ts`).
+- **Hay que subir el `?v=` de `og:image`.** Las previews se cachean por mucho tiempo; sin
+  cambiar ese número, WhatsApp sigue mostrando la imagen vieja.
+
+El JPEG pesa 90 KB a propósito: sobre ~600 KB WhatsApp no muestra la preview. El PNG original
+pesaba 620 KB, justo en el límite.
+
+## Agregar al calendario
+
+El botón vive bajo la cuenta regresiva y ofrece Google Calendar o un `.ics` para Apple y Outlook.
+El evento se define en `EVENTO` ([src/config.ts](src/config.ts)): va de las **17:30 a las 02:00**,
+parte a la hora de llegada y no a las 18:00 de la ceremonia para que nadie llegue justo, y los dos
+extremos llevan el huso de Chile explícito. La hora de término es un supuesto: el documento de
+contenido no dice hasta cuándo va la fiesta.

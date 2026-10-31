@@ -54,7 +54,7 @@ export function Hero() {
             component="img"
             className="paper-img"
             src={ilustracion}
-            alt="Ilustración en acuarela de Cristián y Rocío mirándose y sonriendo"
+            alt="Ilustración en acuarela de Rocío y Cristián mirándose y sonriendo"
             sx={{ my: -1 }}
           />
         </motion.div>
