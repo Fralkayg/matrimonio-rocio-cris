@@ -32,7 +32,6 @@ export function Rsvp() {
             }}
           >
             <Ilustracion src={RSVP.imagen} ancho={200} sx={{ mb: 1 }} />
-
             <Typography variant="overline" sx={{ color: colores.apagado }}>
               Confirmación de asistencia
             </Typography>
