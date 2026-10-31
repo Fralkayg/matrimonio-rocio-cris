@@ -1,19 +1,12 @@
-import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import { colores } from '../theme';
 import { NAV, NOVIOS } from '../config';
-import { BotonCancion, ReproductorCancion, hayReproductor } from './ui/ReproductorCancion';
+import { BotonCancion, ReproductorCancion, hayReproductor, useCancion } from './ui/ReproductorCancion';
 
 export function Nav() {
   const [izq, der] = NOVIOS.iniciales.split('&').map((s) => s.trim());
-  const [abierto, setAbierto] = useState(false);
-  const [montado, setMontado] = useState(false);
-
-  function alternarCancion() {
-    setMontado(true);
-    setAbierto((a) => !a);
-  }
+  const cancion = useCancion();
 
   return (
     <Box
@@ -55,7 +48,7 @@ export function Nav() {
           >
             {izq} <Box component="span" sx={{ fontStyle: 'italic' }}>&amp;</Box> {der}
           </Link>
-          {hayReproductor && <BotonCancion abierto={abierto} onClick={alternarCancion} />}
+          {hayReproductor && <BotonCancion sonando={cancion.sonando} onClick={cancion.alternar} />}
         </Box>
         <Box
           sx={{
@@ -84,7 +77,7 @@ export function Nav() {
           ))}
         </Box>
       </Box>
-      {hayReproductor && <ReproductorCancion abierto={abierto} montado={montado} />}
+      {hayReproductor && <ReproductorCancion contenedor={cancion.contenedor} visible={cancion.visible} />}
     </Box>
   );
 }
