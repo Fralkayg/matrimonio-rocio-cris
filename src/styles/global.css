@@ -1,0 +1,119 @@
+/* Textura de papel y la rejilla de la línea de tiempo: más claras en CSS que en `sx`. */
+
+:root {
+  --papel: #fcfbf9;
+  --borde: #e6dfd3;
+  --regla: #d9d0c3;
+}
+
+body {
+  margin: 0;
+  background: var(--papel) url(../assets/paper.png) repeat;
+  background-size: 480px 480px;
+}
+
+/* Mismo fondo para las tarjetas y la barra superior, para que no se vea el corte. */
+.paper {
+  background: var(--papel) url(../assets/paper.png) repeat;
+  background-size: 480px 480px;
+}
+
+.paper-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 78%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 78%, transparent 100%);
+}
+
+/* ---------- Línea de tiempo ---------- */
+.tl-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 120px;
+}
+.tl-line {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 50%;
+  width: 1px;
+  background: var(--regla);
+}
+.tl-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
+  grid-template-areas: 'text dot photo';
+  align-items: center;
+}
+.tl-item.flip {
+  grid-template-areas: 'photo dot text';
+}
+.tl-text {
+  grid-area: text;
+  text-align: right;
+}
+.tl-item.flip .tl-text {
+  text-align: left;
+}
+.tl-dot {
+  grid-area: dot;
+  justify-self: center;
+  position: relative;
+  z-index: 1;
+}
+.tl-photo {
+  grid-area: photo;
+}
+
+@media (max-width: 760px) {
+  .tl-wrap {
+    gap: 72px;
+  }
+  .tl-line {
+    left: 20px;
+  }
+  .tl-item,
+  .tl-item.flip {
+    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-areas: 'dot text' 'dot photo';
+    column-gap: 20px;
+    row-gap: 20px;
+    align-items: start;
+  }
+  .tl-text,
+  .tl-item.flip .tl-text {
+    text-align: left;
+  }
+}
+
+/* Respeta a quien pide menos movimiento: Framer Motion ya lo hace, esto cubre el resto. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- Impresión ---------- */
+@media print {
+  /* Sin esto el navegador descarta la textura de papel y el fondo de las tarjetas. */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* La barra pegada se repetiría en cada página. */
+  header {
+    position: static !important;
+  }
+
+  /* Que una tarjeta o un hito no se parta en dos hojas. */
+  .MuiPaper-root,
+  .tl-item {
+    break-inside: avoid;
+  }
+}
