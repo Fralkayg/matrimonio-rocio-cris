@@ -5,6 +5,8 @@ import { VESTIMENTA } from '../config';
 import { PaperCard } from './ui/PaperCard';
 import { Reveal } from './ui/Reveal';
 import { Script } from './ui/Script';
+import { Ilustracion } from './ui/Ilustracion';
+import { Regla } from './ui/Deco';
 
 /**
  * Código de vestimenta. Va en tarjeta propia y a tamaño de titular: al final de
@@ -24,6 +26,8 @@ export function Vestimenta() {
           p: { xs: '40px 24px', sm: '56px 48px' },
         }}
       >
+        <Ilustracion src={VESTIMENTA.imagen} ancho={210} sx={{ mb: 1 }} />
+
         <Typography variant="overline" sx={{ color: colores.apagado }}>
           Código de vestimenta
         </Typography>
@@ -41,36 +45,37 @@ export function Vestimenta() {
           {VESTIMENTA.detalle}
         </Typography>
 
-        {/* La única petición concreta: que se note. */}
+        {/* La única petición concreta del documento de contenido. Va como nota al
+            pie, separada por el mismo filete del hero y del pie de página: el
+            recuadro anterior pesaba más que el propio código de vestimenta. */}
         <Box
           sx={{
-            mt: 2.5,
+            mt: 4,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: 2.5,
-            maxWidth: 560,
-            px: { xs: 2.5, sm: 3.5 },
-            py: 2.5,
-            border: `1px solid ${colores.bordeFuerte}`,
-            bgcolor: 'rgba(255,255,255,0.7)',
-            textAlign: 'left',
+            gap: 1.75,
           }}
         >
-          <Box
-            aria-hidden="true"
+          <Regla ancho={100} />
+          <Typography
+            variant="overline"
+            sx={{ fontSize: 13, letterSpacing: '0.34em', color: colores.apagado }}
+          >
+            Un detalle
+          </Typography>
+          <Typography
             sx={{
-              flex: '0 0 auto',
-              width: 34,
-              height: 34,
-              borderRadius: '50%',
-              bgcolor: '#FFFFFF',
-              border: `1px solid ${colores.regla}`,
+              maxWidth: 440,
+              fontSize: { xs: 21, sm: 24 },
+              fontStyle: 'italic',
+              lineHeight: 1.5,
             }}
-          />
-          <Typography sx={{ fontSize: { xs: 19, sm: 21 }, fontStyle: 'italic', lineHeight: 1.5 }}>
+          >
             {VESTIMENTA.nota}
           </Typography>
         </Box>
+
       </PaperCard>
     </Reveal>
   );

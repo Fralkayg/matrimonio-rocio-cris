@@ -9,7 +9,7 @@ import { Regla } from './ui/Deco';
 import { IconoFlecha } from './ui/Iconos';
 import { Script } from './ui/Script';
 import { CuentaRegresiva } from './ui/CuentaRegresiva';
-import ilustracion from '../assets/save-the-date.png';
+import ilustracion from '../assets/hero-recortado.png';
 
 export function Hero() {
   const fecha = useFecha();

@@ -6,6 +6,7 @@ import { RSVP } from '../config';
 import { PaperCard } from './ui/PaperCard';
 import { Reveal } from './ui/Reveal';
 import { Script } from './ui/Script';
+import { Ilustracion } from './ui/Ilustracion';
 
 /** Confirmación de asistencia: el formulario y la fecha límite. */
 export function Rsvp() {
@@ -30,6 +31,8 @@ export function Rsvp() {
               gap: 1.5,
             }}
           >
+            <Ilustracion src={RSVP.imagen} ancho={200} sx={{ mb: 1 }} />
+
             <Typography variant="overline" sx={{ color: colores.apagado }}>
               Confirmación de asistencia
             </Typography>
