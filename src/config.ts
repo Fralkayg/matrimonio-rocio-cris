@@ -3,8 +3,21 @@
  * Los textos entre [corchetes] son los que todavía faltan por completar.
  */
 
-/** Fecha del matrimonio (hora local). Alimenta la fecha larga, el 30 . 01 . 27 y la cuenta regresiva. */
+import anillo from './assets/anillo-a.png';
+import fiesta from './assets/fiesta-a.png';
+import auto from './assets/auto-c.png';
+import comida from './assets/comida-a.png';
+import regalos from './assets/regalos-c.png';
+
+/** Día del matrimonio. Alimenta la fecha larga, el 30 . 01 . 27 y los días que faltan. */
 export const FECHA_MATRIMONIO = '2027-01-30';
+
+/**
+ * Momento exacto en que empieza la ceremonia, para la cuenta regresiva.
+ * El huso va explícito (Chile en verano, UTC−3) para que la cuenta sea la misma
+ * se mire el sitio desde donde se mire.
+ */
+export const INICIO_CEREMONIA = '2027-01-30T18:00:00-03:00';
 
 /** Fecha límite para confirmar asistencia. */
 export const FECHA_LIMITE_RSVP = '2026-12-10';
@@ -33,6 +46,7 @@ export type Hito = {
   lugar: string;
   nota?: string;
   maps: string;
+  imagen: string;
 };
 
 /** Las dos tarjetas de "El gran día". Ceremonia y fiesta son en el mismo fundo. */
@@ -45,6 +59,7 @@ export const MOMENTOS: Hito[] = [
     lugar: LUGAR.nombre,
     nota: 'Llegada desde las 17:30 h. La ceremonia comienza a las 18:00 en punto, así que les sugerimos llegar unos 30 minutos antes.',
     maps: MAPS_FUNDO,
+    imagen: anillo,
   },
   {
     rotulo: '¡a celebrar!',
@@ -53,13 +68,16 @@ export const MOMENTOS: Hito[] = [
     lugar: LUGAR.nombre,
     nota: 'En el mismo fundo, a solo pasos de la parroquia. No hay que moverse de lugar.',
     maps: MAPS_FUNDO,
+    imagen: fiesta,
   },
 ];
 
 export const VESTIMENTA = {
+  script: '¡prepara tu mejor pinta!',
   titulo: 'Formal',
-  detalle:
-    '¡Prepara tu mejor pinta! Queremos darle un ambiente formal a nuestro matrimonio. Les pedimos reservar el color blanco exclusivamente para la novia.',
+  detalle: 'Queremos darle un ambiente formal a nuestro matrimonio.',
+  /** Se muestra aparte, porque es la única petición concreta. */
+  nota: 'Les pedimos reservar el color blanco exclusivamente para la novia.',
 } as const;
 
 export const RSVP = {
@@ -74,11 +92,12 @@ export const REGALOS = {
     'Lo más importante para nosotros es contar con su compañía en este día tan especial. Si además de su presencia desean hacernos un regalo, está habilitado nuestro link de novios Falabella.',
   link: 'https://novios.falabella.com/info-evento/evento?codigoEvento=2106243&ref=search',
   codigo: '2106243',
+  imagen: regalos,
 } as const;
 
 export type Detalle = {
   id: string;
-  icono: 'auto' | 'regalo' | 'plato';
+  imagen: string;
   rotulo: string;
   titulo: string;
   texto: string;
@@ -87,7 +106,7 @@ export type Detalle = {
 export const DETALLES: Detalle[] = [
   {
     id: 'estacionamiento',
-    icono: 'auto',
+    imagen: auto,
     rotulo: 'Estacionamiento',
     titulo: 'Llegar y volver tranquilos',
     texto:
@@ -95,7 +114,7 @@ export const DETALLES: Detalle[] = [
   },
   {
     id: 'alergias',
-    icono: 'plato',
+    imagen: comida,
     rotulo: 'Alergias',
     titulo: 'Cuéntanos qué no puedes comer',
     texto:
@@ -167,9 +186,9 @@ export const HISTORIA: Capitulo[] = [
 ];
 
 export const NAV = [
-  { href: '#historia', label: 'Historia' },
+  // { href: '#historia', label: 'Historia' },
   { href: '#fechas', label: 'El gran día' },
   { href: '#detalles', label: 'Detalles' },
   { href: '#confirmar', label: 'Confirmar' },
-  { href: '#trivia', label: 'Trivia' },
+  // { href: '#trivia', label: 'Trivia' },
 ] as const;

@@ -2,11 +2,13 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { colores } from '../theme';
-import { LUGAR, MOMENTOS, VESTIMENTA } from '../config';
+import { LUGAR, MOMENTOS } from '../config';
 import { useFecha } from '../hooks/useFecha';
 import { PaperCard } from './ui/PaperCard';
 import { Reveal } from './ui/Reveal';
 import { Script } from './ui/Script';
+import { Ilustracion } from './ui/Ilustracion';
+import { Vestimenta } from './Vestimenta';
 
 export function GranDia() {
   const fecha = useFecha();
@@ -96,6 +98,7 @@ export function GranDia() {
                   gap: 1.25,
                 }}
               >
+                <Ilustracion src={m.imagen} ancho={168} sx={{ mb: 0.5 }} />
                 <Script size={40}>{m.rotulo}</Script>
                 <Typography
                   variant="h3"
@@ -138,26 +141,7 @@ export function GranDia() {
           ))}
         </Box>
 
-        {/* Vestimenta */}
-        <Reveal>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              gap: 1,
-            }}
-          >
-            <Typography variant="overline" sx={{ color: colores.apagado }}>
-              Vestimenta
-            </Typography>
-            <Typography sx={{ fontSize: 26, fontStyle: 'italic' }}>{VESTIMENTA.titulo}</Typography>
-            <Typography variant="body2" sx={{ maxWidth: 620, color: colores.texto }}>
-              {VESTIMENTA.detalle}
-            </Typography>
-          </Box>
-        </Reveal>
+        <Vestimenta />
       </Box>
     </Box>
   );

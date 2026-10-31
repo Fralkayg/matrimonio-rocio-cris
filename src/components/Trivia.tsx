@@ -9,7 +9,6 @@ import { PaperCard } from './ui/PaperCard';
 import { Reveal } from './ui/Reveal';
 import { Script } from './ui/Script';
 import { SectionHeading } from './ui/SectionHeading';
-import { Deco } from './ui/Deco';
 
 const LETRAS = ['A', 'B', 'C', 'D'];
 const COLORES_OPCION = ['#F4E3AE', '#F6D3C7', '#D9E4F0', '#E1E7D5'];
@@ -108,15 +107,9 @@ export function Trivia() {
   }
 
   return (
-    <Box component="section" id="trivia" sx={{ position: 'relative', overflow: 'hidden' }}>
-      <Deco trazo="estrella" color={colores.coral} width={40} height={40} sx={{ top: 96, left: '9%' }} />
-      <Deco trazo="ola" color={colores.azul} width={80} height={20} grosor={3} sx={{ top: 140, right: '10%' }} />
-      <Deco trazo="rama" color={colores.salvia} width={70} height={90} sx={{ bottom: 120, left: '7%' }} />
-      <Deco trazo="sol" color={colores.oro} width={60} height={60} grosor={4} sx={{ bottom: 160, right: '9%' }} />
-
+    <Box component="section" id="trivia">
       <Box
         sx={{
-          position: 'relative',
           maxWidth: 820,
           mx: 'auto',
           px: 3,

@@ -87,14 +87,33 @@ body {
   .tl-item.flip .tl-text {
     text-align: left;
   }
-  .deco {
-    display: none;
-  }
 }
 
 /* Respeta a quien pide menos movimiento: Framer Motion ya lo hace, esto cubre el resto. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+}
+
+/* ---------- Impresión ---------- */
+@media print {
+  /* Sin esto el navegador descarta la textura de papel y el fondo de las tarjetas. */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* La barra pegada se repetiría en cada página. */
+  header {
+    position: static !important;
+  }
+
+  /* Que una tarjeta o un hito no se parta en dos hojas. */
+  .MuiPaper-root,
+  .tl-item {
+    break-inside: avoid;
   }
 }

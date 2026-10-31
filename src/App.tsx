@@ -3,11 +3,11 @@ import { colores } from './theme';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
 import { Invitacion } from './components/Invitacion';
-import { Historia } from './components/Historia';
+// import { Historia } from './components/Historia';
 import { GranDia } from './components/GranDia';
 import { Detalles } from './components/Detalles';
 import { Rsvp } from './components/Rsvp';
-import { Trivia } from './components/Trivia';
+// import { Trivia } from './components/Trivia';
 import { Footer } from './components/Footer';
 
 export default function App() {
@@ -16,11 +16,11 @@ export default function App() {
       <Nav />
       <Hero />
       <Invitacion />
-      <Historia />
+      {/* <Historia /> */}
       <GranDia />
       <Detalles />
       <Rsvp />
-      <Trivia />
+      {/* <Trivia /> */}
       <Footer />
     </Box>
   );

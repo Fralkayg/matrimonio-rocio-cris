@@ -7,3 +7,4 @@ dist/
 *.log
 *.tsbuildinfo
 MEMORY.md
+exports/

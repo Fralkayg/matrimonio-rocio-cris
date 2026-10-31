@@ -42,9 +42,6 @@ export function Footer() {
         <Typography sx={{ mt: 0.75, fontSize: 18, fontStyle: 'italic', color: colores.texto }}>
           Con mucho cariño, {NOVIOS.firma}
         </Typography>
-        <Typography sx={{ fontSize: 16, fontStyle: 'italic', color: colores.apagado }}>
-          Hecho con cariño por {NOVIOS.creditos}
-        </Typography>
       </Box>
     </Box>
   );

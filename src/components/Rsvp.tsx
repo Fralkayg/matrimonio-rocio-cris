@@ -40,8 +40,12 @@ export function Rsvp() {
               antes del {RSVP.limite}
             </Script>
             <Typography variant="body1" sx={{ mt: 1.5, maxWidth: 560, color: colores.texto }}>
-              Les pedimos confirmar su asistencia antes del {RSVP.limite}. {RSVP.instruccion} Si
-              tienen alguna alergia o restricción alimentaria, cuéntennos ahí mismo.
+              Les pedimos confirmar su asistencia{' '}
+              <Box component="strong" sx={{ fontWeight: 600, color: colores.tinta }}>
+                antes del {RSVP.limite}
+              </Box>
+              . {RSVP.instruccion} Si tienen alguna alergia o restricción alimentaria, cuéntennos
+              ahí mismo.
             </Typography>
             <Button
               variant="contained"

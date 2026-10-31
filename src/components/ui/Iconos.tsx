@@ -22,30 +22,6 @@ export const IconoFoto = ({ size = 26 }: Props) => (
   </svg>
 );
 
-export const IconoAuto = ({ size = 26 }: Props) => (
-  <svg {...base(size)}>
-    <path d="M3 13l2-6h14l2 6" />
-    <path d="M2 13h20v5H2z" />
-    <circle cx="6.5" cy="18.5" r="1.8" />
-    <circle cx="17.5" cy="18.5" r="1.8" />
-  </svg>
-);
-
-export const IconoRegalo = ({ size = 26 }: Props) => (
-  <svg {...base(size)}>
-    <path d="M3 9h18v12H3z" />
-    <path d="M3 9h18M12 9v12" />
-    <path d="M12 9S9.5 3 7 4.5 9 9 12 9zM12 9s2.5-6 5-4.5S15 9 12 9z" />
-  </svg>
-);
-
-export const IconoPlato = ({ size = 26 }: Props) => (
-  <svg {...base(size)}>
-    <circle cx="12" cy="12" r="9" />
-    <circle cx="12" cy="12" r="4.5" />
-  </svg>
-);
-
 export const IconoFlecha = ({ size = 16 }: Props) => (
   <svg
     width={size}
