@@ -216,9 +216,9 @@ export const EVENTO = {
  */
 export const CANCION = {
   tipo: 'spotify' as 'spotify' | 'youtube',
-  id: '',
-  titulo: '[Nombre de la canción]',
-  artista: '[Artista]',
+  id: '6RUKPb4LETWmmr3iAEQktW',
+  titulo: 'Something Just Like This',
+  artista: 'The Chainsmokers & Coldplay',
   nota: 'La canción que nos tiene bailando desde el primer día.',
 } as const;
 
