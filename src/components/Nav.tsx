@@ -1,10 +1,19 @@
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import { colores } from '../theme';
 import { NAV, NOVIOS } from '../config';
+import { BotonCancion, ReproductorCancion, hayReproductor } from './ui/ReproductorCancion';
 
 export function Nav() {
   const [izq, der] = NOVIOS.iniciales.split('&').map((s) => s.trim());
+  const [abierto, setAbierto] = useState(false);
+  const [montado, setMontado] = useState(false);
+
+  function alternarCancion() {
+    setMontado(true);
+    setAbierto((a) => !a);
+  }
 
   return (
     <Box
@@ -31,20 +40,23 @@ export function Nav() {
           gap: '8px 24px',
         }}
       >
-        <Link
-          href="#inicio"
-          underline="none"
-          sx={{
-            fontSize: 26,
-            fontWeight: 500,
-            letterSpacing: '0.12em',
-            color: colores.apagado,
-            py: 1,
-            '&:hover': { color: colores.marron },
-          }}
-        >
-          {izq} <Box component="span" sx={{ fontStyle: 'italic' }}>&amp;</Box> {der}
-        </Link>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Link
+            href="#inicio"
+            underline="none"
+            sx={{
+              fontSize: 26,
+              fontWeight: 500,
+              letterSpacing: '0.12em',
+              color: colores.apagado,
+              py: 1,
+              '&:hover': { color: colores.marron },
+            }}
+          >
+            {izq} <Box component="span" sx={{ fontStyle: 'italic' }}>&amp;</Box> {der}
+          </Link>
+          {hayReproductor && <BotonCancion abierto={abierto} onClick={alternarCancion} />}
+        </Box>
         <Box
           sx={{
             display: 'flex',
@@ -72,6 +84,7 @@ export function Nav() {
           ))}
         </Box>
       </Box>
+      {hayReproductor && <ReproductorCancion abierto={abierto} montado={montado} />}
     </Box>
   );
 }
