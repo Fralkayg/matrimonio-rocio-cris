@@ -5,7 +5,7 @@ import { CANCION } from '../../config';
 /** Spotify ofrece el embebido en 80 px (compacto) o 152 px. */
 const ALTO = 80;
 
-export const hayReproductor = CANCION.tipo === 'spotify' && Boolean(CANCION.id);
+export const hayReproductor = Boolean(CANCION.id);
 
 /** El botón ♪ del header. Abre o cierra el reproductor. */
 export function BotonCancion({ abierto, onClick }: { abierto: boolean; onClick: () => void }) {
