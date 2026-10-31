@@ -87,15 +87,39 @@ export function urlGoogleCalendar(): string {
   return `https://calendar.google.com/calendar/render?${params.toString()}&dates=${fechas}`;
 }
 
-/** Baja el .ics como archivo. Se revoca el object URL para no filtrar memoria. */
-export function descargarIcs(nombre = 'matrimonio-rocio-cristian.ics'): void {
-  const blob = new Blob([construirIcs()], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nombre;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+/**
+ * El .ics se publica como archivo estático (lo emite el plugin de vite.config.ts)
+ * y no como blob: Safari en iPhone solo abre la hoja «Agregar al calendario» al
+ * navegar a una URL https servida como text/calendar; con un blob lo baja a Archivos.
+ */
+export const ARCHIVO_ICS = 'matrimonio-rocio-cristian.ics';
+
+export const esAndroid = () => /Android/i.test(navigator.userAgent);
+
+/** Los iPad nuevos se presentan como Mac; se delatan por la pantalla táctil. */
+export const esIos = () =>
+  /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+
+/**
+ * En Android, un intent abre la app de Google Calendar con el formulario del
+ * evento ya lleno. Si la app no está, Chrome sigue a `browser_fallback_url`.
+ */
+export function intentGoogleCalendar(): string {
+  const extras = [
+    `S.title=${encodeURIComponent(EVENTO.titulo)}`,
+    `l.beginTime=${Date.parse(EVENTO.inicio)}`,
+    `l.endTime=${Date.parse(EVENTO.fin)}`,
+    `S.eventLocation=${encodeURIComponent(EVENTO.lugar)}`,
+    `S.description=${encodeURIComponent(`${EVENTO.descripcion}\n\n${SITIO_URL}`)}`,
+    `S.browser_fallback_url=${encodeURIComponent(urlGoogleCalendar())}`,
+  ];
+  return [
+    'intent:#Intent',
+    'action=android.intent.action.INSERT',
+    'type=vnd.android.cursor.item/event',
+    'package=com.google.android.calendar',
+    ...extras,
+    'end',
+  ].join(';');
 }
