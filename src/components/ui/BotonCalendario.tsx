@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { colores } from '../../theme';
-import { descargarIcs, urlGoogleCalendar } from '../../lib/calendario';
+import { ARCHIVO_ICS, esAndroid, esIos, intentGoogleCalendar, urlGoogleCalendar } from '../../lib/calendario';
 
 /**
  * Un solo botón con menú: dos botones sueltos («Google» y «.ics») obligarían al
@@ -14,12 +14,15 @@ export function BotonCalendario() {
   const abierto = Boolean(ancla);
 
   function google() {
-    window.open(urlGoogleCalendar(), '_blank', 'noopener,noreferrer');
+    // En Android abre la app; en iOS la app no acepta eventos por URL, así que va a la web.
+    if (esAndroid()) window.location.href = intentGoogleCalendar();
+    else window.open(urlGoogleCalendar(), '_blank', 'noopener,noreferrer');
     setAncla(null);
   }
 
   function ics() {
-    descargarIcs();
+    // iPhone muestra la hoja de Calendario; en escritorio se descarga el archivo.
+    window.location.href = `${import.meta.env.BASE_URL}${ARCHIVO_ICS}`;
     setAncla(null);
   }
 
@@ -56,7 +59,7 @@ export function BotonCalendario() {
           Google Calendar
         </MenuItem>
         <MenuItem onClick={ics} sx={{ fontSize: 19, py: 1.25, px: 3 }}>
-          Apple u Outlook (.ics)
+          {esIos() ? 'Calendario de iPhone' : 'Apple u Outlook (.ics)'}
         </MenuItem>
       </Menu>
     </>
