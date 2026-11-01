@@ -10,6 +10,7 @@
  *  4. Copia la URL que termina en /exec y pégala en SOLTEROS.scriptUrl (src/config.ts).
  *
  * Los mensajes quedan en la hoja «Mensajes». Para borrar uno, borra su fila.
+ * El Instagram es opcional y se guarda solo el usuario, sin @ ni link.
  * Si cambias este código: Implementar › Gestionar implementaciones › editar (lápiz)
  * › Versión: «Nueva versión». La URL se mantiene.
  */
@@ -17,6 +18,8 @@
 const HOJA = 'Mensajes';
 const MAX_NOMBRE = 60;
 const MAX_MENSAJE = 500;
+/** Los usuarios de Instagram: hasta 30 letras, números, puntos y guiones bajos. */
+const INSTAGRAM = /^[A-Za-z0-9._]{1,30}$/;
 /** Cuántos mensajes (los más recientes) devuelve el chat. */
 const MAX_LISTA = 300;
 
@@ -25,9 +28,11 @@ function hoja_() {
   let hoja = libro.getSheetByName(HOJA);
   if (!hoja) {
     hoja = libro.insertSheet(HOJA);
-    hoja.appendRow(['Fecha', 'Nombre', 'Mensaje']);
+    hoja.appendRow(['Fecha', 'Nombre', 'Mensaje', 'Instagram']);
     hoja.setFrozenRows(1);
   }
+  // Hojas creadas antes de que existiera la columna Instagram.
+  if (hoja.getRange(1, 4).getValue() === '') hoja.getRange(1, 4).setValue('Instagram');
   return hoja;
 }
 
@@ -48,7 +53,7 @@ function doGet() {
   if (ultima < 2) return json_({ mensajes: [] });
 
   const desde = Math.max(2, ultima - MAX_LISTA + 1);
-  const filas = hoja.getRange(desde, 1, ultima - desde + 1, 3).getValues();
+  const filas = hoja.getRange(desde, 1, ultima - desde + 1, 4).getValues();
 
   return json_({
     mensajes: filas
@@ -57,6 +62,7 @@ function doGet() {
         fecha: new Date(f[0]).toISOString(),
         nombre: String(f[1]),
         mensaje: String(f[2]),
+        instagram: String(f[3] || ''),
       })),
   });
 }
@@ -75,11 +81,13 @@ function doPost(e) {
   const nombre = String(datos.nombre || '').trim().slice(0, MAX_NOMBRE);
   const mensaje = String(datos.mensaje || '').trim().slice(0, MAX_MENSAJE);
   if (!nombre || !mensaje) return json_({ ok: false, error: 'vacio' });
+  const instagram = String(datos.instagram || '').trim();
+  if (instagram && !INSTAGRAM.test(instagram)) return json_({ ok: false, error: 'instagram' });
 
   const candado = LockService.getScriptLock();
   candado.waitLock(10000);
   try {
-    hoja_().appendRow([new Date(), sinFormula_(nombre), sinFormula_(mensaje)]);
+    hoja_().appendRow([new Date(), sinFormula_(nombre), sinFormula_(mensaje), instagram]);
   } finally {
     candado.releaseLock();
   }
