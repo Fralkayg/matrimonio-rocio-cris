@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
+import Link from '@mui/material/Link';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Typography from '@mui/material/Typography';
+import InstagramIcon from '@mui/icons-material/Instagram';
 import { colores } from '../theme';
 import { SOLTEROS } from '../config';
 import {
@@ -11,25 +14,28 @@ import {
   chatConectado,
   enviarMensaje,
   listarMensajes,
+  urlInstagram,
+  usuarioInstagram,
   type Mensaje,
 } from '../lib/solteros';
 import { PaperCard } from './ui/PaperCard';
 import { SectionHeading } from './ui/SectionHeading';
 
-/** Se recuerda el nombre para no pedirlo en cada mensaje y para marcar los propios. */
+/** Se recuerdan nombre e Instagram para no pedirlos en cada mensaje y para marcar los propios. */
 const CLAVE_NOMBRE = 'solteros:nombre';
+const CLAVE_INSTAGRAM = 'solteros:instagram';
 
-function leerNombre(): string {
+function leer(clave: string): string {
   try {
-    return localStorage.getItem(CLAVE_NOMBRE) ?? '';
+    return localStorage.getItem(clave) ?? '';
   } catch {
     return '';
   }
 }
 
-function guardarNombre(nombre: string) {
+function guardar(clave: string, valor: string) {
   try {
-    localStorage.setItem(CLAVE_NOMBRE, nombre);
+    localStorage.setItem(clave, valor);
   } catch {
     // Modo privado o almacenamiento bloqueado: solo se pierde la comodidad.
   }
@@ -58,7 +64,8 @@ const rotuloCampo = {
 export function Solteros() {
   const [mensajes, setMensajes] = useState<Mensaje[] | null>(null);
   const [errorCarga, setErrorCarga] = useState(false);
-  const [nombre, setNombre] = useState(leerNombre);
+  const [nombre, setNombre] = useState(() => leer(CLAVE_NOMBRE));
+  const [instagram, setInstagram] = useState(() => leer(CLAVE_INSTAGRAM));
   const [texto, setTexto] = useState('');
   const [trampa, setTrampa] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -94,16 +101,32 @@ export function Solteros() {
     e.preventDefault();
     const n = nombre.trim();
     const m = texto.trim();
-    if (!n || !m || enviando) return;
+    const ig = usuarioInstagram(instagram);
+    if (!n || !m || ig === null || enviando) return;
 
     setEnviando(true);
     setErrorEnvio(false);
     try {
-      await enviarMensaje({ nombre: n, mensaje: m, sitio: trampa });
-      guardarNombre(n);
+      await enviarMensaje({
+        nombre: n,
+        mensaje: m,
+        instagram: ig,
+        sitio: trampa,
+      });
+      guardar(CLAVE_NOMBRE, n);
+      guardar(CLAVE_INSTAGRAM, ig);
+      setInstagram(ig);
       setTexto('');
       // Se muestra de inmediato; la próxima carga trae la versión guardada.
-      setMensajes((prev) => [...(prev ?? []), { fecha: new Date().toISOString(), nombre: n, mensaje: m }]);
+      setMensajes((prev) => [
+        ...(prev ?? []),
+        {
+          fecha: new Date().toISOString(),
+          nombre: n,
+          mensaje: m,
+          instagram: ig,
+        },
+      ]);
       cargar();
     } catch {
       setErrorEnvio(true);
@@ -112,11 +135,20 @@ export function Solteros() {
     }
   }
 
-  const propio = leerNombre().trim().toLowerCase();
+  const propio = leer(CLAVE_NOMBRE).trim().toLowerCase();
+  const instagramInvalido = usuarioInstagram(instagram) === null;
 
   return (
     <Box component="section" id="solteros">
-      <Box sx={{ maxWidth: 760, mx: 'auto', px: 3, pt: { xs: 7, md: 11 }, pb: { xs: 9, md: 13 } }}>
+      <Box
+        sx={{
+          maxWidth: 760,
+          mx: 'auto',
+          px: 3,
+          pt: { xs: 7, md: 11 },
+          pb: { xs: 9, md: 13 },
+        }}
+      >
         <SectionHeading
           rotulo="Lista de solteros"
           titulo="¿Vienes sin pareja?"
@@ -154,17 +186,35 @@ export function Solteros() {
               }}
             >
               {mensajes === null && !errorCarga && (
-                <Typography sx={{ m: 'auto', fontStyle: 'italic', color: colores.apagado }}>
+                <Typography
+                  sx={{
+                    m: 'auto',
+                    fontStyle: 'italic',
+                    color: colores.apagado,
+                  }}
+                >
                   Cargando mensajes…
                 </Typography>
               )}
               {errorCarga && mensajes === null && (
-                <Typography sx={{ m: 'auto', fontStyle: 'italic', color: colores.apagado }}>
+                <Typography
+                  sx={{
+                    m: 'auto',
+                    fontStyle: 'italic',
+                    color: colores.apagado,
+                  }}
+                >
                   No pudimos cargar los mensajes. Prueba recargando la página.
                 </Typography>
               )}
               {mensajes?.length === 0 && (
-                <Typography sx={{ m: 'auto', fontStyle: 'italic', color: colores.apagado }}>
+                <Typography
+                  sx={{
+                    m: 'auto',
+                    fontStyle: 'italic',
+                    color: colores.apagado,
+                  }}
+                >
                   Todavía no hay nadie. ¡Rompe el hielo!
                 </Typography>
               )}
@@ -183,14 +233,46 @@ export function Solteros() {
                       border: `1px solid ${colores.borde}`,
                     }}
                   >
-                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'baseline', flexWrap: 'wrap' }}>
-                      <Typography sx={{ fontSize: 16, fontWeight: 600, color: colores.verdeOscuro }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        gap: 1.5,
+                        alignItems: 'baseline',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: 16,
+                          fontWeight: 600,
+                          color: colores.verdeOscuro,
+                        }}
+                      >
                         {m.nombre}
                       </Typography>
                       <Typography sx={{ fontSize: 13, color: colores.apagado }}>
                         {formatoFecha.format(new Date(m.fecha))}
                       </Typography>
                     </Box>
+                    {m.instagram && (
+                      <Link
+                        href={urlInstagram(m.instagram)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        underline="hover"
+                        aria-label={`Seguir a ${m.nombre} en Instagram (@${m.instagram})`}
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          mb: 0.25,
+                          fontSize: 15,
+                          color: colores.coral,
+                        }}
+                      >
+                        <InstagramIcon sx={{ fontSize: 18 }} />@{m.instagram}
+                      </Link>
+                    )}
                     <Typography
                       sx={{
                         fontSize: 18,
@@ -210,7 +292,12 @@ export function Solteros() {
             <Box
               component="form"
               onSubmit={enviar}
-              sx={{ p: { xs: 2, sm: 3 }, display: 'flex', flexDirection: 'column', gap: 1.5 }}
+              sx={{
+                p: { xs: 2, sm: 3 },
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5,
+              }}
             >
               <Typography component="label" htmlFor="solteros-nombre" sx={rotuloCampo}>
                 Tu nombre
@@ -223,7 +310,61 @@ export function Solteros() {
                 onChange={(e) => setNombre(e.target.value)}
                 inputProps={{ maxLength: MAX_NOMBRE }}
               />
-              <Typography component="label" htmlFor="solteros-mensaje" sx={{ ...rotuloCampo, mt: 1 }}>
+              <Typography
+                component="label"
+                htmlFor="solteros-instagram"
+                sx={{ ...rotuloCampo, mt: 1 }}
+              >
+                Tu Instagram{' '}
+                <Box
+                  component="span"
+                  sx={{
+                    letterSpacing: '0.1em',
+                    textTransform: 'none',
+                    fontWeight: 400,
+                    fontStyle: 'italic',
+                  }}
+                >
+                  (opcional, para que te sigan)
+                </Box>
+              </Typography>
+              <OutlinedInput
+                id="solteros-instagram"
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                placeholder="usuario"
+                value={instagram}
+                onChange={(e) => setInstagram(e.target.value)}
+                // Si pegaron el link del perfil, al salir del campo queda solo el usuario.
+                onBlur={() => setInstagram((v) => usuarioInstagram(v) ?? v)}
+                sx={{ '& input': { pl: 0.5 } }}
+                error={instagramInvalido}
+                inputProps={{
+                  maxLength: 80,
+                  'aria-describedby': 'solteros-instagram-ayuda',
+                }}
+                startAdornment={
+                  <InputAdornment position="start" sx={{ color: colores.apagado, mr: 0 }}>
+                    <InstagramIcon sx={{ mr: 0.5 }} />@
+                  </InputAdornment>
+                }
+              />
+              {instagramInvalido && (
+                <Typography
+                  id="solteros-instagram-ayuda"
+                  variant="body2"
+                  sx={{ color: colores.coral, fontStyle: 'italic' }}
+                >
+                  Eso no parece un usuario de Instagram: solo letras, números, puntos y guiones
+                  bajos.
+                </Typography>
+              )}
+              <Typography
+                component="label"
+                htmlFor="solteros-mensaje"
+                sx={{ ...rotuloCampo, mt: 1 }}
+              >
                 Tu mensaje
               </Typography>
               <OutlinedInput
@@ -245,7 +386,13 @@ export function Solteros() {
                 aria-hidden
                 value={trampa}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setTrampa(e.target.value)}
-                sx={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }}
+                sx={{
+                  position: 'absolute',
+                  left: -9999,
+                  width: 1,
+                  height: 1,
+                  opacity: 0,
+                }}
               />
               <Box
                 sx={{
@@ -257,7 +404,13 @@ export function Solteros() {
                   gap: 2,
                 }}
               >
-                <Typography variant="body2" sx={{ fontStyle: 'italic', color: errorEnvio ? colores.coral : colores.texto }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontStyle: 'italic',
+                    color: errorEnvio ? colores.coral : colores.texto,
+                  }}
+                >
                   {errorEnvio
                     ? 'No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.'
                     : `${texto.length}/${MAX_MENSAJE}`}
@@ -265,7 +418,7 @@ export function Solteros() {
                 <Button
                   type="submit"
                   variant="contained"
-                  disabled={enviando || !nombre.trim() || !texto.trim()}
+                  disabled={enviando || !nombre.trim() || !texto.trim() || instagramInvalido}
                 >
                   {enviando ? 'Enviando…' : 'Enviar'}
                 </Button>
