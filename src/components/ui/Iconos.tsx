@@ -38,3 +38,15 @@ export const IconoFlecha = ({ size = 16 }: Props) => (
     <path d="M4 23l6 6 6-6" />
   </svg>
 );
+
+export const IconoMenu = ({ size = 26 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </svg>
+);
+
+export const IconoCerrar = ({ size = 26 }: Props) => (
+  <svg {...base(size)}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+);

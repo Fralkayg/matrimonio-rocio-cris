@@ -41,4 +41,13 @@ function eventoIcs(): Plugin {
 export default defineConfig({
   plugins: [react(), eventoIcs()],
   base: './',
+  build: {
+    rollupOptions: {
+      // Cada página es su propio HTML: así /solteros/ funciona en GitHub Pages sin router.
+      input: {
+        portada: fileURLToPath(new URL('./index.html', import.meta.url)),
+        solteros: fileURLToPath(new URL('./solteros/index.html', import.meta.url)),
+      },
+    },
+  },
 });

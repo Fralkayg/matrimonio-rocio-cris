@@ -117,3 +117,8 @@ body {
     break-inside: avoid;
   }
 }
+
+/* Que los links del menú no dejen el título de la sección bajo el header sticky. */
+html {
+  scroll-padding-top: 80px;
+}
