@@ -40,16 +40,17 @@ npm run typecheck
 ```
 index.html               ← la portada
 solteros/index.html      ← la página «Lista de solteros» (/solteros/)
-apps-script/solteros.gs  ← el backend del chat de solteros (corre en Google, no en el sitio)
+mensajes/index.html      ← la página «Mensajes para los novios» (/mensajes/)
+apps-script/muros.gs     ← el backend de los dos chats (corre en Google, no en el sitio)
 src/
   config.ts              ← TODO el contenido editable (fechas, lugar, links, trivia, historia)
   theme.ts               ← paleta y tipografía del diseño
   hooks/useFecha.ts       ← fecha larga, 30 . 01 . 27 y la cuenta regresiva
   lib/calendario.ts       ← genera el .ics y el link de Google Calendar
-  lib/solteros.ts         ← lee y envía los mensajes del chat de solteros
+  lib/muros.ts            ← lee y envía los mensajes de los muros
   styles/                 ← fuentes + papel + rejilla de la línea de tiempo
   components/
-    Nav, Hero, Invitacion, Historia, GranDia, Detalles, Rsvp, Trivia, Solteros, Footer
+    Nav, Hero, Invitacion, Historia, GranDia, Detalles, Rsvp, Trivia, Muro, Footer
     ui/                   ← Reveal, SectionHeading, PaperCard, Script, Deco, Iconos, ReproductorCancion
 ```
 
@@ -90,7 +91,7 @@ Todo lo que queda entre `[corchetes]` vive en [src/config.ts](src/config.ts):
 | `TRIVIA.premio` | Qué se gana quien saque el mejor puntaje |
 | `NOVIOS.creditos` | Quién hizo el sitio |
 | `CANCION.id` | El id de YouTube de la canción que suena con el botón ♪ del header. **Con `id` vacío el botón no aparece**, así que el sitio nunca queda con un reproductor roto |
-| `SOLTEROS.scriptUrl` | La URL `/exec` del Apps Script de la lista de solteros. Mientras esté vacía, la página dice que el chat «se abre muy pronto» |
+| `MUROS.scriptUrl` | La URL `/exec` del Apps Script de los muros de mensajes. Mientras esté vacía, las páginas dicen que el chat «se abre muy pronto». Los textos de cada muro también viven en `MUROS` |
 
 Las fotos de la línea de tiempo son recuadros grises con su pie. Para ponerlas de verdad, agrega el
 campo de imagen a `Capitulo` en `src/config.ts` y reemplaza el `<Foto>` de
@@ -128,13 +129,18 @@ Dos cosas a tener en cuenta si la cambias:
 El JPEG pesa 90 KB a propósito: sobre ~600 KB WhatsApp no muestra la preview. El PNG original
 pesaba 620 KB, justo en el límite.
 
-## Lista de solteros
+## Muros de mensajes: solteros y novios
 
-`/solteros/` es una página aparte (su propio HTML, sin router, para que funcione tal cual en
-GitHub Pages) con un chat abierto donde los invitados sin pareja se presentan. Los mensajes se
-guardan en una planilla de Google a través de un Apps Script; los pasos para crearlo, una sola vez,
-están al principio de [apps-script/solteros.gs](apps-script/solteros.gs). Para moderar, se borra la
-fila en la planilla.
+Dos páginas aparte (cada una con su propio HTML, sin router, para que funcionen tal cual en
+GitHub Pages), con el mismo chat abierto (`components/Muro.tsx`):
+
+- `/solteros/`: los invitados sin pareja se presentan, con su Instagram opcional.
+- `/mensajes/`: buenos deseos para los novios, a la vista de todos.
+
+Los mensajes se guardan en una planilla de Google a través de un Apps Script, una hoja por muro
+(«Mensajes» para solteros y «Para los novios»); los pasos para crearlo, una sola vez, están al
+principio de [apps-script/muros.gs](apps-script/muros.gs). Para moderar, se borra la fila en la
+planilla.
 
 ## Agregar al calendario
 

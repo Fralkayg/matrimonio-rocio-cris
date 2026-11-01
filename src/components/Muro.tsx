@@ -7,7 +7,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Typography from '@mui/material/Typography';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import { colores } from '../theme';
-import { SOLTEROS } from '../config';
+import { MUROS, type MuroId } from '../config';
 import {
   MAX_MENSAJE,
   MAX_NOMBRE,
@@ -17,13 +17,13 @@ import {
   urlInstagram,
   usuarioInstagram,
   type Mensaje,
-} from '../lib/solteros';
+} from '../lib/muros';
 import { PaperCard } from './ui/PaperCard';
 import { SectionHeading } from './ui/SectionHeading';
 
 /** Se recuerdan nombre e Instagram para no pedirlos en cada mensaje y para marcar los propios. */
-const CLAVE_NOMBRE = 'solteros:nombre';
-const CLAVE_INSTAGRAM = 'solteros:instagram';
+const CLAVE_NOMBRE = 'muros:nombre';
+const CLAVE_INSTAGRAM = 'muros:instagram';
 
 function leer(clave: string): string {
   try {
@@ -57,11 +57,13 @@ const rotuloCampo = {
 } as const;
 
 /**
- * Lista de solteros: un chat abierto donde los invitados que vienen sin pareja
- * se presentan. Los mensajes viven en una planilla de Google (ver
- * apps-script/solteros.gs) y se refrescan solos mientras la página está abierta.
+ * Un muro de mensajes: un chat abierto que lee todo el que entra (la lista de
+ * solteros, los mensajes para los novios). Los textos salen de MUROS en
+ * config.ts; los mensajes viven en una planilla de Google (ver
+ * apps-script/muros.gs) y se refrescan solos mientras la página está abierta.
  */
-export function Solteros() {
+export function Muro({ muro }: { muro: MuroId }) {
+  const textos = MUROS[muro];
   const [mensajes, setMensajes] = useState<Mensaje[] | null>(null);
   const [errorCarga, setErrorCarga] = useState(false);
   const [nombre, setNombre] = useState(() => leer(CLAVE_NOMBRE));
@@ -74,12 +76,12 @@ export function Solteros() {
 
   const cargar = useCallback(async () => {
     try {
-      setMensajes(await listarMensajes());
+      setMensajes(await listarMensajes(muro));
       setErrorCarga(false);
     } catch {
       setErrorCarga(true);
     }
-  }, []);
+  }, [muro]);
 
   useEffect(() => {
     if (!chatConectado) return;
@@ -87,7 +89,7 @@ export function Solteros() {
     // Solo se pregunta mientras la pestaña está a la vista.
     const id = window.setInterval(() => {
       if (document.visibilityState === 'visible') cargar();
-    }, SOLTEROS.refrescoMs);
+    }, MUROS.refrescoMs);
     return () => window.clearInterval(id);
   }, [cargar]);
 
@@ -101,21 +103,24 @@ export function Solteros() {
     e.preventDefault();
     const n = nombre.trim();
     const m = texto.trim();
-    const ig = usuarioInstagram(instagram);
+    const ig = textos.instagram ? usuarioInstagram(instagram) : '';
     if (!n || !m || ig === null || enviando) return;
 
     setEnviando(true);
     setErrorEnvio(false);
     try {
       await enviarMensaje({
+        muro,
         nombre: n,
         mensaje: m,
         instagram: ig,
         sitio: trampa,
       });
       guardar(CLAVE_NOMBRE, n);
-      guardar(CLAVE_INSTAGRAM, ig);
-      setInstagram(ig);
+      if (textos.instagram) {
+        guardar(CLAVE_INSTAGRAM, ig);
+        setInstagram(ig);
+      }
       setTexto('');
       // Se muestra de inmediato; la próxima carga trae la versión guardada.
       setMensajes((prev) => [
@@ -136,10 +141,10 @@ export function Solteros() {
   }
 
   const propio = leer(CLAVE_NOMBRE).trim().toLowerCase();
-  const instagramInvalido = usuarioInstagram(instagram) === null;
+  const instagramInvalido = textos.instagram && usuarioInstagram(instagram) === null;
 
   return (
-    <Box component="section" id="solteros">
+    <Box component="section" id={muro}>
       <Box
         sx={{
           maxWidth: 760,
@@ -149,17 +154,12 @@ export function Solteros() {
           pb: { xs: 9, md: 13 },
         }}
       >
-        <SectionHeading
-          rotulo="Lista de solteros"
-          titulo="¿Vienes sin pareja?"
-          script="aquí se arma la mesa más entretenida"
-        />
+        <SectionHeading rotulo={textos.rotulo} titulo={textos.titulo} script={textos.script} />
         <Typography
           variant="body1"
           sx={{ mt: 3, mb: 5, textAlign: 'center', color: colores.texto }}
         >
-          Preséntate: cuéntanos quién eres, de dónde nos conoces y algo que no se pueda saber por
-          Instagram. Todos los invitados pueden leer lo que escribas acá… y quién sabe.
+          {textos.intro}
         </Typography>
 
         {!chatConectado ? (
@@ -174,7 +174,7 @@ export function Solteros() {
               ref={lista}
               role="log"
               aria-live="polite"
-              aria-label="Mensajes de la lista de solteros"
+              aria-label={`Mensajes: ${textos.rotulo}`}
               sx={{
                 height: { xs: 420, sm: 480 },
                 overflowY: 'auto',
@@ -215,7 +215,7 @@ export function Solteros() {
                     color: colores.apagado,
                   }}
                 >
-                  Todavía no hay nadie. ¡Rompe el hielo!
+                  {textos.vacio}
                 </Typography>
               )}
               {mensajes?.map((m, i) => {
@@ -299,79 +299,83 @@ export function Solteros() {
                 gap: 1.5,
               }}
             >
-              <Typography component="label" htmlFor="solteros-nombre" sx={rotuloCampo}>
+              <Typography component="label" htmlFor={`${muro}-nombre`} sx={rotuloCampo}>
                 Tu nombre
               </Typography>
               <OutlinedInput
-                id="solteros-nombre"
+                id={`${muro}-nombre`}
                 autoComplete="name"
                 placeholder="Ej: Primo Joaquín"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 inputProps={{ maxLength: MAX_NOMBRE }}
               />
-              <Typography
-                component="label"
-                htmlFor="solteros-instagram"
-                sx={{ ...rotuloCampo, mt: 1 }}
-              >
-                Tu Instagram{' '}
-                <Box
-                  component="span"
-                  sx={{
-                    letterSpacing: '0.1em',
-                    textTransform: 'none',
-                    fontWeight: 400,
-                    fontStyle: 'italic',
-                  }}
-                >
-                  (opcional, para que te sigan)
-                </Box>
-              </Typography>
-              <OutlinedInput
-                id="solteros-instagram"
-                autoComplete="off"
-                autoCapitalize="none"
-                spellCheck={false}
-                placeholder="usuario"
-                value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
-                // Si pegaron el link del perfil, al salir del campo queda solo el usuario.
-                onBlur={() => setInstagram((v) => usuarioInstagram(v) ?? v)}
-                sx={{ '& input': { pl: 0.5 } }}
-                error={instagramInvalido}
-                inputProps={{
-                  maxLength: 80,
-                  'aria-describedby': 'solteros-instagram-ayuda',
-                }}
-                startAdornment={
-                  <InputAdornment position="start" sx={{ color: colores.apagado, mr: 0 }}>
-                    <InstagramIcon sx={{ mr: 0.5 }} />@
-                  </InputAdornment>
-                }
-              />
-              {instagramInvalido && (
-                <Typography
-                  id="solteros-instagram-ayuda"
-                  variant="body2"
-                  sx={{ color: colores.coral, fontStyle: 'italic' }}
-                >
-                  Eso no parece un usuario de Instagram: solo letras, números, puntos y guiones
-                  bajos.
-                </Typography>
+              {textos.instagram && (
+                <>
+                  <Typography
+                    component="label"
+                    htmlFor={`${muro}-instagram`}
+                    sx={{ ...rotuloCampo, mt: 1 }}
+                  >
+                    Tu Instagram{' '}
+                    <Box
+                      component="span"
+                      sx={{
+                        letterSpacing: '0.1em',
+                        textTransform: 'none',
+                        fontWeight: 400,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      (opcional, para que te sigan)
+                    </Box>
+                  </Typography>
+                  <OutlinedInput
+                    id={`${muro}-instagram`}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    placeholder="usuario"
+                    value={instagram}
+                    onChange={(e) => setInstagram(e.target.value)}
+                    // Si pegaron el link del perfil, al salir del campo queda solo el usuario.
+                    onBlur={() => setInstagram((v) => usuarioInstagram(v) ?? v)}
+                    sx={{ '& input': { pl: 0.5 } }}
+                    error={instagramInvalido}
+                    inputProps={{
+                      maxLength: 80,
+                      'aria-describedby': `${muro}-instagram-ayuda`,
+                    }}
+                    startAdornment={
+                      <InputAdornment position="start" sx={{ color: colores.apagado, mr: 0 }}>
+                        <InstagramIcon sx={{ mr: 0.5 }} />@
+                      </InputAdornment>
+                    }
+                  />
+                  {instagramInvalido && (
+                    <Typography
+                      id={`${muro}-instagram-ayuda`}
+                      variant="body2"
+                      sx={{ color: colores.coral, fontStyle: 'italic' }}
+                    >
+                      Eso no parece un usuario de Instagram: solo letras, números, puntos y guiones
+                      bajos.
+                    </Typography>
+                  )}
+                </>
               )}
               <Typography
                 component="label"
-                htmlFor="solteros-mensaje"
+                htmlFor={`${muro}-mensaje`}
                 sx={{ ...rotuloCampo, mt: 1 }}
               >
                 Tu mensaje
               </Typography>
               <OutlinedInput
-                id="solteros-mensaje"
+                id={`${muro}-mensaje`}
                 multiline
                 minRows={3}
-                placeholder="Hola, soy…"
+                placeholder={textos.placeholder}
                 value={texto}
                 onChange={(e) => setTexto(e.target.value)}
                 inputProps={{ maxLength: MAX_MENSAJE }}

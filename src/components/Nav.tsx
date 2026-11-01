@@ -11,7 +11,7 @@ import { BotonCancion, ReproductorCancion, hayReproductor, useCancion } from './
 type Props = {
   /**
    * Ruta a la portada desde la página actual: '' en la portada, '../' en
-   * /solteros/. Así los links a las secciones sirven desde cualquier página.
+   * /solteros/ y /mensajes/. Así los links sirven desde cualquier página.
    */
   raiz?: string;
 };
@@ -26,6 +26,7 @@ export function Nav({ raiz = '' }: Props) {
 
   const links = [
     ...NAV.map((item) => ({ href: `${raiz}${item.href}`, label: item.label })),
+    { href: `${raiz || './'}mensajes/`, label: 'Mensajes' },
     { href: `${raiz || './'}solteros/`, label: 'Solteros' },
   ];
 

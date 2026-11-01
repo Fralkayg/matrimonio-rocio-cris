@@ -232,14 +232,40 @@ export const NAV = [
 ] as const;
 
 /**
- * La página «Lista de solteros» (/solteros/). Los mensajes se guardan en una
- * planilla de Google mediante un Apps Script: los pasos para crearlo están en
- * apps-script/solteros.gs. `scriptUrl` vacío = la página avisa que el chat
- * todavía no está conectado.
+ * Los muros de mensajes: páginas con un chat abierto que lee todo el que entra.
+ * Los mensajes se guardan en una planilla de Google mediante un Apps Script
+ * (los pasos para crearlo están en apps-script/muros.gs), una hoja por muro.
+ * `scriptUrl` vacío = las páginas avisan que el chat todavía no está conectado.
  */
-export const SOLTEROS = {
+export const MUROS = {
   scriptUrl:
     'https://script.google.com/macros/s/AKfycbx-OEOe0wSv8kOowLAcPmAeAakiz4kSBlqRF96HF_B6fqbB42vnHgZgMf5Yy3ZHlxw/exec',
   /** Cada cuánto se buscan mensajes nuevos mientras la página está abierta. */
   refrescoMs: 15000,
+
+  /** /solteros/: los invitados sin pareja se presentan. */
+  solteros: {
+    rotulo: 'Lista de solteros',
+    titulo: '¿Vienes sin pareja?',
+    script: 'aquí se arma la mesa más entretenida',
+    intro:
+      'Preséntate: cuéntanos quién eres, de dónde nos conoces y algo que no se pueda saber por Instagram. Todos los invitados pueden leer lo que escribas acá… y quién sabe.',
+    placeholder: 'Hola, soy…',
+    vacio: 'Todavía no hay nadie. ¡Rompe el hielo!',
+    instagram: true,
+  },
+
+  /** /mensajes/: buenos deseos para los novios, a la vista de todos. */
+  novios: {
+    rotulo: 'Mensajes para los novios',
+    titulo: 'Déjanos unas palabras',
+    script: 'las vamos a leer todas',
+    intro:
+      'Un buen deseo, un consejo para el matrimonio, un recuerdo con nosotros… Lo que escribas acá lo pueden leer todos los invitados.',
+    placeholder: 'Queridos Rocío y Cristián…',
+    vacio: 'Todavía no hay mensajes. ¡Estrena el muro!',
+    instagram: false,
+  },
 } as const;
+
+export type MuroId = 'solteros' | 'novios';

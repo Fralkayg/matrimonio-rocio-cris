@@ -47,6 +47,7 @@ export default defineConfig({
       input: {
         portada: fileURLToPath(new URL('./index.html', import.meta.url)),
         solteros: fileURLToPath(new URL('./solteros/index.html', import.meta.url)),
+        mensajes: fileURLToPath(new URL('./mensajes/index.html', import.meta.url)),
       },
     },
   },
