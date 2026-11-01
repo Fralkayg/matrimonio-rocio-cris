@@ -25,7 +25,7 @@ export const INICIO_CEREMONIA = '2027-01-30T18:00:00-03:00';
 export const FECHA_LIMITE_RSVP = '2026-12-10';
 
 /** URL pública del sitio. La usan las etiquetas Open Graph y el evento de calendario. */
-export const SITIO_URL = 'https://fralkayg.github.io/matrimonio-rocio-cris/';
+export const SITIO_URL = 'https://rocioycristian.cl/';
 
 export const NOVIOS = {
   titulo: 'Rocío & Cristián',
