@@ -209,19 +209,36 @@ export const EVENTO = {
 /**
  * La canción de los novios, en el botón ♪ del header. `id` vacío = no hay
  * botón, para que el sitio nunca quede con un reproductor roto.
- * El id sale de la URL de Spotify: open.spotify.com/track/<id>
- * (o «Compartir › Copiar link»).
+ * Es el id de YouTube: lo que va después de `v=` en el link del video.
+ * Conviene el video «- Topic» del artista (solo el audio del disco, sin las
+ * intros habladas de los videoclips).
  */
 export const CANCION = {
-  id: '6RUKPb4LETWmmr3iAEQktW',
-  titulo: 'Something Just Like This',
-  artista: 'The Chainsmokers & Coldplay',
+  id: '7f_mlKlOLMo',
+  titulo: 'So Easy (To Fall In Love)',
+  artista: 'Olivia Dean',
 } as const;
 
+/** Las secciones de la página, en orden. Arman el menú del header. */
 export const NAV = [
   // { href: '#historia', label: 'Historia' },
+  { href: '#invitacion', label: 'Invitación' },
   { href: '#fechas', label: 'El gran día' },
+  { href: '#vestimenta', label: 'Vestimenta' },
   { href: '#detalles', label: 'Detalles' },
+  { href: '#regalos', label: 'Regalos' },
   { href: '#confirmar', label: 'Confirmar' },
   // { href: '#trivia', label: 'Trivia' },
 ] as const;
+
+/**
+ * La página «Lista de solteros» (/solteros/). Los mensajes se guardan en una
+ * planilla de Google mediante un Apps Script: los pasos para crearlo están en
+ * apps-script/solteros.gs. `scriptUrl` vacío = la página avisa que el chat
+ * todavía no está conectado.
+ */
+export const SOLTEROS = {
+  scriptUrl: '',
+  /** Cada cuánto se buscan mensajes nuevos mientras la página está abierta. */
+  refrescoMs: 15000,
+} as const;

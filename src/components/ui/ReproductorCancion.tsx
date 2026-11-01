@@ -3,44 +3,56 @@ import Box from '@mui/material/Box';
 import { colores } from '../../theme';
 import { CANCION } from '../../config';
 
-/** Spotify ofrece el embebido en 80 px (compacto) o 152 px. */
-const ALTO = 80;
+/** Tamaño del reproductor cuando se despliega (16:9). */
+const ANCHO = 320;
+const ALTO = 180;
 
 /**
  * Si al tocar ♪ la canción no arranca en este plazo, el navegador bloqueó el
- * play (pasa en Safari de iPhone) y se muestra el reproductor para tocarlo ahí.
+ * play (puede pasar en Safari de iPhone) y se muestra el video para tocarlo ahí.
  */
-const ESPERA_MS = 2000;
+const ESPERA_MS = 2500;
 
 export const hayReproductor = Boolean(CANCION.id);
 
-/** Lo mínimo que se usa del Embed iFrame API de Spotify. */
-interface Controlador {
-  togglePlay: () => void;
+/** Lo mínimo que se usa del IFrame Player API de YouTube. */
+interface Reproductor {
+  playVideo: () => void;
+  pauseVideo: () => void;
   destroy: () => void;
-  addListener: (evento: 'ready' | 'playback_update', cb: (e: { data: { isPaused: boolean } }) => void) => void;
 }
-interface IFrameApi {
-  createController: (
+interface YT {
+  Player: new (
     el: HTMLElement,
-    opciones: { uri: string; width: string; height: number },
-    cb: (c: Controlador) => void,
-  ) => void;
+    opciones: {
+      host: string;
+      videoId: string;
+      width: number;
+      height: number;
+      playerVars: Record<string, string | number>;
+      events: {
+        onReady: (e: { target: Reproductor }) => void;
+        onStateChange: (e: { data: number }) => void;
+      };
+    },
+  ) => Reproductor;
+  PlayerState: { PLAYING: number };
 }
 declare global {
   interface Window {
-    onSpotifyIframeApiReady?: (api: IFrameApi) => void;
+    YT?: YT;
+    onYouTubeIframeAPIReady?: () => void;
   }
 }
 
-let apiPromesa: Promise<IFrameApi> | null = null;
+let apiPromesa: Promise<YT> | null = null;
 
 /** El script se pide una sola vez aunque React monte el componente dos veces. */
-function cargarApi(): Promise<IFrameApi> {
+function cargarApi(): Promise<YT> {
   apiPromesa ??= new Promise((resolve) => {
-    window.onSpotifyIframeApiReady = resolve;
+    window.onYouTubeIframeAPIReady = () => resolve(window.YT!);
     const script = document.createElement('script');
-    script.src = 'https://open.spotify.com/embed/iframe-api/v1';
+    script.src = 'https://www.youtube.com/iframe_api';
     script.async = true;
     document.body.appendChild(script);
   });
@@ -48,13 +60,13 @@ function cargarApi(): Promise<IFrameApi> {
 }
 
 /**
- * El reproductor de Spotify se carga oculto al abrir la página, para que el
+ * El reproductor de YouTube se carga oculto al abrir la página, para que el
  * botón ♪ pueda darle play al instante: si se cargara recién al tocar, el
  * navegador ya no contaría el toque como permiso para sonar.
  */
 export function useCancion() {
   const contenedor = useRef<HTMLDivElement>(null);
-  const controlador = useRef<Controlador | null>(null);
+  const reproductor = useRef<Reproductor | null>(null);
   const espera = useRef<number>(undefined);
   const [sonando, setSonando] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -63,48 +75,53 @@ export function useCancion() {
     const host = contenedor.current;
     if (!hayReproductor || !host) return;
 
-    // Spotify reemplaza el nodo que recibe por su iframe; se le da uno propio
+    // YouTube reemplaza el nodo que recibe por su iframe; se le da uno propio
     // para no tocar nodos que maneja React.
     const nodo = document.createElement('div');
     host.appendChild(nodo);
     let vigente = true;
 
-    cargarApi().then((api) => {
+    cargarApi().then((yt) => {
       if (!vigente) return;
-      api.createController(
-        nodo,
-        { uri: `spotify:track:${CANCION.id}`, width: '100%', height: ALTO },
-        (c) => {
-          if (!vigente) return c.destroy();
-          controlador.current = c;
-          c.addListener('playback_update', ({ data }) => {
-            setSonando(!data.isPaused);
-            if (!data.isPaused) {
+      const r = new yt.Player(nodo, {
+        host: 'https://www.youtube-nocookie.com',
+        videoId: CANCION.id,
+        width: ANCHO,
+        height: ALTO,
+        // `loop` solo funciona si la playlist es el mismo video.
+        playerVars: { playsinline: 1, loop: 1, playlist: CANCION.id, rel: 0 },
+        events: {
+          onReady: () => {
+            if (vigente) reproductor.current = r;
+          },
+          onStateChange: ({ data }) => {
+            const suena = data === yt.PlayerState.PLAYING;
+            setSonando(suena);
+            if (suena) {
               window.clearTimeout(espera.current);
               setVisible(false);
             }
-          });
+          },
         },
-      );
+      });
     });
 
     return () => {
       vigente = false;
       window.clearTimeout(espera.current);
-      controlador.current?.destroy();
-      controlador.current = null;
+      reproductor.current?.destroy();
+      reproductor.current = null;
       host.replaceChildren();
     };
   }, []);
 
   function alternar() {
-    const c = controlador.current;
-    if (!c) return setVisible((v) => !v);
-    c.togglePlay();
-    if (!sonando) {
-      window.clearTimeout(espera.current);
-      espera.current = window.setTimeout(() => setVisible(true), ESPERA_MS);
-    }
+    const r = reproductor.current;
+    if (!r) return setVisible((v) => !v);
+    if (sonando) return r.pauseVideo();
+    r.playVideo();
+    window.clearTimeout(espera.current);
+    espera.current = window.setTimeout(() => setVisible(true), ESPERA_MS);
   }
 
   return { contenedor, sonando, visible, alternar };
@@ -118,11 +135,17 @@ export function BotonCancion({ sonando, onClick }: { sonando: boolean; onClick: 
       type="button"
       onClick={onClick}
       aria-pressed={sonando}
-      aria-label={sonando ? 'Pausar nuestra canción' : 'Escuchar nuestra canción'}
+      aria-label={
+        sonando
+          ? `Pausar «${CANCION.titulo}»`
+          : `Escuchar nuestra canción: «${CANCION.titulo}» de ${CANCION.artista}`
+      }
+      title={`${CANCION.titulo} · ${CANCION.artista}`}
       sx={{
         ml: 1.5,
         width: 36,
         height: 36,
+        flexShrink: 0,
         borderRadius: '50%',
         border: `1px solid ${sonando ? colores.verde : colores.bordeFuerte}`,
         background: sonando ? colores.verde : 'transparent',
@@ -162,7 +185,10 @@ export function ReproductorCancion({
         transition: 'height 250ms ease',
       }}
     >
-      <Box ref={contenedor} sx={{ maxWidth: 520, mx: 'auto', px: 2, pb: 2, '& iframe': { borderRadius: 3 } }} />
+      <Box
+        ref={contenedor}
+        sx={{ display: 'flex', justifyContent: 'center', pb: 2, '& iframe': { borderRadius: 2 } }}
+      />
     </Box>
   );
 }
