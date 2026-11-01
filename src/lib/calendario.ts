@@ -51,6 +51,7 @@ export function construirIcs(): string {
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
+    // El UID no cambia con el dominio: si cambiara, quien ya agendó el evento lo vería duplicado.
     `UID:matrimonio-rocio-cristian-${aUtc(EVENTO.inicio)}@fralkayg.github.io`,
     `DTSTAMP:${aUtc(new Date().toISOString())}`,
     `DTSTART:${aUtc(EVENTO.inicio)}`,

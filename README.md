@@ -122,7 +122,8 @@ Dos cosas a tener en cuenta si la cambias:
 
 - **Las URL de las etiquetas son absolutas y están escritas a mano.** Los scrapers de WhatsApp
   y compañía no resuelven rutas relativas, así que `base: './'` no sirve acá. Si cambia el
-  dominio, hay que editarlas en `index.html` (y `SITIO_URL` en `config.ts`).
+  dominio, hay que editarlas en `index.html`, `solteros/index.html` y `mensajes/index.html` (y
+  `SITIO_URL` en `config.ts`). Hoy apuntan a https://rocioycristian.cl/.
 - **Hay que subir el `?v=` de `og:image`.** Las previews se cachean por mucho tiempo; sin
   cambiar ese número, WhatsApp sigue mostrando la imagen vieja.
 
