@@ -16,6 +16,7 @@ export function Vestimenta() {
   return (
     <Reveal>
       <PaperCard
+        id="vestimenta"
         sx={{
           borderTop: `4px solid ${colores.oro}`,
           display: 'flex',
