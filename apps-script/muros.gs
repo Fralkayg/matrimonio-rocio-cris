@@ -1,21 +1,24 @@
 /**
- * Lista de solteros: guarda y entrega los mensajes del chat de /solteros/
- * en una planilla de Google. Corre en Google Apps Script, no en el sitio.
+ * Muros de mensajes: guarda y entrega los mensajes de los chats del sitio
+ * (/solteros/ y /mensajes/) en una planilla de Google, una hoja por muro.
+ * Corre en Google Apps Script, no en el sitio.
  *
  * Cómo conectarlo (se hace una sola vez):
- *  1. Crea una planilla en https://sheets.new y ponle nombre («Lista de solteros»).
+ *  1. Crea una planilla en https://sheets.new y ponle nombre («Muros del matrimonio»).
  *  2. Extensiones › Apps Script. Borra lo que haya, pega este archivo completo y guarda.
  *  3. Implementar › Nueva implementación › tipo «Aplicación web».
  *     Ejecutar como: «Yo». Quién tiene acceso: «Cualquier persona». Implementar y autorizar.
  *  4. Copia la URL que termina en /exec y pégala en SOLTEROS.scriptUrl (src/config.ts).
  *
- * Los mensajes quedan en la hoja «Mensajes». Para borrar uno, borra su fila.
+ * Los de solteros quedan en la hoja «Mensajes» y los de los novios en «Para los novios».
+ * Para borrar un mensaje, borra su fila.
  * El Instagram es opcional y se guarda solo el usuario, sin @ ni link.
  * Si cambias este código: Implementar › Gestionar implementaciones › editar (lápiz)
  * › Versión: «Nueva versión». La URL se mantiene.
  */
 
-const HOJA = 'Mensajes';
+/** Una hoja por muro. «Mensajes» es la de solteros desde antes de que hubiera más muros. */
+const HOJAS = { solteros: 'Mensajes', novios: 'Para los novios' };
 const MAX_NOMBRE = 60;
 const MAX_MENSAJE = 500;
 /** Los usuarios de Instagram: hasta 30 letras, números, puntos y guiones bajos. */
@@ -23,11 +26,13 @@ const INSTAGRAM = /^[A-Za-z0-9._]{1,30}$/;
 /** Cuántos mensajes (los más recientes) devuelve el chat. */
 const MAX_LISTA = 300;
 
-function hoja_() {
+/** Lo que no sea un muro conocido cae en solteros, como antes. */
+function hoja_(muro) {
+  const nombre = Object.prototype.hasOwnProperty.call(HOJAS, muro) ? HOJAS[muro] : HOJAS.solteros;
   const libro = SpreadsheetApp.getActiveSpreadsheet();
-  let hoja = libro.getSheetByName(HOJA);
+  let hoja = libro.getSheetByName(nombre);
   if (!hoja) {
-    hoja = libro.insertSheet(HOJA);
+    hoja = libro.insertSheet(nombre);
     hoja.appendRow(['Fecha', 'Nombre', 'Mensaje', 'Instagram']);
     hoja.setFrozenRows(1);
   }
@@ -47,8 +52,8 @@ function sinFormula_(texto) {
   return /^[=+\-@]/.test(texto) ? "'" + texto : texto;
 }
 
-function doGet() {
-  const hoja = hoja_();
+function doGet(e) {
+  const hoja = hoja_(e.parameter.muro);
   const ultima = hoja.getLastRow();
   if (ultima < 2) return json_({ mensajes: [] });
 
@@ -87,7 +92,7 @@ function doPost(e) {
   const candado = LockService.getScriptLock();
   candado.waitLock(10000);
   try {
-    hoja_().appendRow([new Date(), sinFormula_(nombre), sinFormula_(mensaje), instagram]);
+    hoja_(datos.muro).appendRow([new Date(), sinFormula_(nombre), sinFormula_(mensaje), instagram]);
   } finally {
     candado.releaseLock();
   }

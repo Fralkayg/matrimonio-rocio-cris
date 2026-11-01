@@ -1,6 +1,6 @@
-import { SOLTEROS } from '../config';
+import { MUROS, type MuroId } from '../config';
 
-/** Los mismos topes que aplica apps-script/solteros.gs. */
+/** Los mismos topes que aplica apps-script/muros.gs. */
 export const MAX_NOMBRE = 60;
 export const MAX_MENSAJE = 500;
 
@@ -28,10 +28,10 @@ export function usuarioInstagram(texto: string): string | null {
 
 export const urlInstagram = (usuario: string) => `https://www.instagram.com/${usuario}/`;
 
-export const chatConectado = Boolean(SOLTEROS.scriptUrl);
+export const chatConectado = Boolean(MUROS.scriptUrl);
 
-export async function listarMensajes(): Promise<Mensaje[]> {
-  const res = await fetch(SOLTEROS.scriptUrl);
+export async function listarMensajes(muro: MuroId): Promise<Mensaje[]> {
+  const res = await fetch(`${MUROS.scriptUrl}?muro=${muro}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const datos: { mensajes: Mensaje[] } = await res.json();
   return datos.mensajes;
@@ -42,12 +42,13 @@ export async function listarMensajes(): Promise<Mensaje[]> {
  * antes un OPTIONS (preflight) que Apps Script no responde, y el POST falla.
  */
 export async function enviarMensaje(m: {
+  muro: MuroId;
   nombre: string;
   mensaje: string;
   instagram: string;
   sitio: string;
 }) {
-  const res = await fetch(SOLTEROS.scriptUrl, {
+  const res = await fetch(MUROS.scriptUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(m),
