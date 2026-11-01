@@ -238,7 +238,8 @@ export const NAV = [
  * todavía no está conectado.
  */
 export const SOLTEROS = {
-  scriptUrl: '',
+  scriptUrl:
+    'https://script.google.com/macros/s/AKfycbx-OEOe0wSv8kOowLAcPmAeAakiz4kSBlqRF96HF_B6fqbB42vnHgZgMf5Yy3ZHlxw/exec',
   /** Cada cuánto se buscan mensajes nuevos mientras la página está abierta. */
   refrescoMs: 15000,
 } as const;
